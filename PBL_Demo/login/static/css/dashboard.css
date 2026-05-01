@@ -1,0 +1,102 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header h1 {
+    color: #333;
+    font-size: 24px;
+}
+
+.header-right {
+    display: flex;
+    gap: 15px;
+}
+
+.admin-link, .logout-link {
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.admin-link {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.admin-link:hover {
+    background-color: #45a049;
+}
+
+.logout-link {
+    background-color: #f44336;
+    color: white;
+}
+
+.logout-link:hover {
+    background-color: #d32f2f;
+}
+
+.profile-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-card h2 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-row {
+    display: flex;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    width: 120px;
+    color: #666;
+    font-weight: 500;
+}
+
+.value {
+    color: #333;
+    flex: 1;
+}
+
+.admin-badge {
+    color: #4CAF50;
+    font-weight: bold;
+}
