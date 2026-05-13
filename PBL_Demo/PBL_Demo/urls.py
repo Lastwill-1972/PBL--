@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
     path('login/', include('login.urls')),
-    path('', include('login.urls')),  # 根路径指向登录页面
+    path('events/', include('events.urls')),
+    path('', include('login.urls')),
 ]
