@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'register',
     'login',
     'events'
+    'login'
 ]
 
 MIDDLEWARE = [

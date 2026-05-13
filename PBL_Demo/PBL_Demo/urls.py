@@ -23,4 +23,5 @@ urlpatterns = [
     path('login/', include('login.urls')),
     path('events/', include('events.urls')),
     path('', include('login.urls')),
+    path('', include('login.urls')),  # 根路径指向登录页面
 ]
