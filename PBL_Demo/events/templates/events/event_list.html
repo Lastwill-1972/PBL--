@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的活动</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .status-draft { color: #ff9800; }
+        .status-published { color: #4CAF50; }
+        .status-cancelled { color: #f44336; }
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .btn-edit { background-color: #2196F3; color: white; }
+        .btn-delete { background-color: #f44336; color: white; }
+        .btn-view { background-color: #9E9E9E; color: white; }
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>活动管理系统</h1>
+        <div>
+            <span>欢迎，{{ user.username }}</span>
+            <a href="/dashboard/">个人中心</a>
+            <a href="/login/logout/">退出</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="content">
+            <a href="{% url 'events:event_create' %}" class="btn">创建新活动</a>
+            {% if events %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>地点</th>
+                        <th>开始时间</th>
+                        <th>结束时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.title }}</td>
+                        <td>{{ event.location }}</td>
+                        <td>{{ event.start_time|date:"Y-m-d H:i" }}</td>
+                        <td>{{ event.end_time|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if event.status == 'draft' %}
+                                <span class="status-draft">草稿</span>
+                            {% elif event.status == 'published' %}
+                                <span class="status-published">已发布</span>
+                            {% else %}
+                                <span class="status-cancelled">已取消</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'events:event_detail' event.id %}" class="action-btn btn-view">查看</a>
+                            <a href="{% url 'events:event_edit' event.id %}" class="action-btn btn-edit">编辑</a>
+                            <a href="{% url 'events:event_delete' event.id %}" class="action-btn btn-delete">删除</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-message">
+                <p>暂无活动，点击上方按钮创建新活动</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
