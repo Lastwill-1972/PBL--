@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确认删除</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .warning {
+            font-size: 48px;
+            color: #f44336;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .event-title {
+            font-weight: bold;
+            color: #f44336;
+        }
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-confirm {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: #9E9E9E;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>确认删除</h1>
+        <div>
+            <span>欢迎，{{ user.username }}</span>
+            <a href="{% url 'events:event_list' %}">我的活动</a>
+            <a href="/dashboard/">个人中心</a>
+            <a href="/login/logout/">退出</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="content">
+            <div class="warning">!</div>
+            <p class="message">确定要删除活动 "<span class="event-title">{{ event.title }}</span>" 吗？</p>
+            <p class="message" style="color: #666; font-size: 14px;">此操作不可恢复</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-confirm">确认删除</button>
+                    <a href="{% url 'events:event_list' %}" class="btn btn-cancel">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

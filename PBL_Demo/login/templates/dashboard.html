@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>欢迎回来，{{ user.username }}</h1>
+            <div class="header-right">
+                <a href="/logout/" class="logout-link">退出登录</a>
+            </div>
+        </div>
+        
+        <div class="profile-card">
+            <h2>个人信息</h2>
+            <div class="info-row">
+                <span class="label">用户名：</span>
+                <span class="value">{{ user.username }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">学院：</span>
+                <span class="value">{{ user.college }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">学号：</span>
+                <span class="value">{{ user.student_id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">注册时间：</span>
+                <span class="value">{{ user.created_at|date:"Y-m-d H:i:s" }}</span>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h2>活动管理</h2>
+            <div class="info-row">
+                <a href="/events/" class="btn">我的活动</a>
+<<<<<<< HEAD
+=======
+                <a href="/events/public/" class="btn">公开活动</a>
+>>>>>>> 7c97f9c (feat:评论功能)
+                <a href="/events/create/" class="btn">创建活动</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

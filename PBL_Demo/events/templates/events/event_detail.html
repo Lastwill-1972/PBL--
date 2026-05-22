@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .event-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .event-meta {
+            display: grid;
+            grid-template-columns: 120px auto;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .event-meta-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .event-content {
+            line-height: 1.8;
+            color: #333;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        .status-draft { color: #ff9800; font-weight: bold; }
+        .status-published { color: #4CAF50; font-weight: bold; }
+        .status-cancelled { color: #f44336; font-weight: bold; }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-edit {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-list {
+            background-color: #9E9E9E;
+            color: white;
+        }
+<<<<<<< HEAD
+=======
+        .comments-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        .comments-section h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .comment-form {
+            margin-bottom: 30px;
+        }
+        .comment-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .btn-submit {
+            background-color: #2196F3;
+            color: white;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-submit:hover {
+            background-color: #1976D2;
+        }
+        .comments-list {
+            margin-top: 20px;
+        }
+        .comment-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .comment-author {
+            font-weight: bold;
+            color: #333;
+        }
+        .comment-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .comment-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-like {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-like:hover {
+            background-color: #eee;
+        }
+        .btn-like.liked {
+            color: #f44336;
+        }
+        .no-comments {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+        }
+>>>>>>> 7c97f9c (feat:评论功能)
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>活动详情</h1>
+        <div>
+            <span>欢迎，{{ user.username }}</span>
+<<<<<<< HEAD
+=======
+            <a href="{% url 'events:public_events' %}">公开活动</a>
+>>>>>>> 7c97f9c (feat:评论功能)
+            <a href="{% url 'events:event_list' %}">我的活动</a>
+            <a href="/dashboard/">个人中心</a>
+            <a href="/login/logout/">退出</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="content">
+            <h2 class="event-title">{{ event.title }}</h2>
+            <div class="event-meta">
+                <span class="event-meta-label">活动地点</span>
+                <span>{{ event.location }}</span>
+                <span class="event-meta-label">开始时间</span>
+                <span>{{ event.start_time|date:"Y-m-d H:i" }}</span>
+                <span class="event-meta-label">结束时间</span>
+                <span>{{ event.end_time|date:"Y-m-d H:i" }}</span>
+                <span class="event-meta-label">组织者</span>
+                <span>{{ event.organizer.username }}</span>
+                <span class="event-meta-label">活动状态</span>
+                <span>
+                    {% if event.status == 'draft' %}
+                        <span class="status-draft">草稿</span>
+                    {% elif event.status == 'published' %}
+                        <span class="status-published">已发布</span>
+                    {% else %}
+                        <span class="status-cancelled">已取消</span>
+                    {% endif %}
+                </span>
+                <span class="event-meta-label">创建时间</span>
+                <span>{{ event.created_at|date:"Y-m-d H:i" }}</span>
+            </div>
+            <div class="event-content">{{ event.content }}</div>
+            <div class="btn-group">
+                <a href="{% url 'events:event_edit' event.id %}" class="btn btn-edit">编辑活动</a>
+                <a href="{% url 'events:event_delete' event.id %}" class="btn btn-delete">删除活动</a>
+                <a href="{% url 'events:event_list' %}" class="btn btn-list">返回列表</a>
+            </div>
+<<<<<<< HEAD
+=======
+            
+            <div class="comments-section">
+                <h3>评论区</h3>
+                
+                <form action="{% url 'comment:add_comment' event.id %}" method="post" class="comment-form">
+                    {% csrf_token %}
+                    <textarea name="content" placeholder="写下你的评论..." rows="3" required></textarea>
+                    <button type="submit" class="btn btn-submit">发表评论</button>
+                </form>
+                
+                <div class="comments-list">
+                    {% for comment in comments %}
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-author">{{ comment.user.username }}</span>
+                            <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                        </div>
+                        <div class="comment-content">{{ comment.content }}</div>
+                        <div class="comment-actions">
+                            <form action="{% url 'comment:toggle_like' comment.id %}" method="post" class="like-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-like {% if comment.id in liked_comment_ids %}liked{% endif %}">
+                                    {% if comment.id in liked_comment_ids %}
+                                        <span>❤️</span> 取消点赞 ({{ comment.likes.count }})
+                                    {% else %}
+                                        <span>🤍</span> 点赞 ({{ comment.likes.count }})
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="no-comments">暂无评论，快来发表第一条评论吧！</p>
+                    {% endfor %}
+                </div>
+            </div>
+>>>>>>> 7c97f9c (feat:评论功能)
+        </div>
+    </div>
+</body>
+</html>
