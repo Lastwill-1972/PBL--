@@ -2,10 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from register.models import User
 from .models import Event
-<<<<<<< HEAD
-=======
-from comment.models import CommentLike
->>>>>>> 7c97f9c (feat:评论功能)
+from comment.models import Comment
+
+
+def public_event_list(request):
+    events = Event.objects.filter(is_public=True, status='published').order_by('-start_time')
+    events_with_comments = []
+    for event in events:
+        comments = event.comments.all()[:5]
+        events_with_comments.append({
+            'event': event,
+            'comments': comments,
+            'comment_count': event.comments.count()
+        })
+    return render(request, 'events/public_event_list.html', {'events_with_comments': events_with_comments})
 
 
 def login_required(view_func):
@@ -36,6 +46,7 @@ def event_create(request):
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
         status = request.POST.get('status', 'draft')
+        is_public = request.POST.get('is_public') == 'on'
 
         errors = {}
         if not title:
@@ -58,7 +69,8 @@ def event_create(request):
                     'location': location,
                     'start_time': start_time,
                     'end_time': end_time,
-                    'status': status
+                    'status': status,
+                    'is_public': is_public
                 },
                 'user': user
             })
@@ -70,7 +82,8 @@ def event_create(request):
             start_time=start_time,
             end_time=end_time,
             organizer=user,
-            status=status
+            status=status,
+            is_public=is_public
         )
         return redirect('events:event_list')
 
@@ -87,13 +100,20 @@ def event_edit(request, event_id):
         return HttpResponseForbidden('您没有权限编辑此活动')
 
     if request.method == 'POST':
+        old_is_public = event.is_public
         event.title = request.POST.get('title')
         event.content = request.POST.get('content')
         event.location = request.POST.get('location')
         event.start_time = request.POST.get('start_time')
         event.end_time = request.POST.get('end_time')
         event.status = request.POST.get('status', 'draft')
+        new_is_public = request.POST.get('is_public') == 'on'
+        event.is_public = new_is_public
         event.save()
+
+        if old_is_public and not new_is_public:
+            Comment.objects.filter(event=event).delete()
+
         return redirect('events:event_list')
 
     return render(request, 'events/event_form.html', {'event': event, 'user': user})
@@ -109,7 +129,14 @@ def event_delete(request, event_id):
         return HttpResponseForbidden('您没有权限删除此活动')
 
     if request.method == 'POST':
-        event.delete()
+        from django.db import connection, ProgrammingError
+        try:
+            event.delete()
+        except ProgrammingError as e:
+            # 如果是因为关联表不存在导致的错误，直接用SQL删除
+            if 'Table' in str(e) and 'doesn\'t exist' in str(e):
+                with connection.cursor() as cursor:
+                    cursor.execute("DELETE FROM events_event WHERE id = %s", [event_id])
         return redirect('events:event_list')
 
     return render(request, 'events/event_confirm_delete.html', {'event': event, 'user': user})
@@ -120,28 +147,5 @@ def event_detail(request, event_id):
     user_id = request.session.get('user_id')
     user = User.objects.get(id=user_id)
     event = get_object_or_404(Event, id=event_id)
-<<<<<<< HEAD
-    return render(request, 'events/event_detail.html', {'event': event, 'user': user})
-=======
-    
     comments = event.comments.all()
-    liked_comment_ids = [like.comment_id for like in CommentLike.objects.filter(user=user, comment__in=comments)]
-    
-    return render(request, 'events/event_detail.html', {
-        'event': event, 
-        'user': user,
-        'comments': comments,
-        'liked_comment_ids': liked_comment_ids
-    })
-
-
-@login_required
-def public_events(request):
-    """公开活动列表页面 - 显示所有已发布的活动"""
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-    
-    events = Event.objects.filter(status='published').order_by('-created_at')
-    
-    return render(request, 'events/public_events.html', {'events': events, 'user': user})
->>>>>>> 7c97f9c (feat:评论功能)
+    return render(request, 'events/event_detail.html', {'event': event, 'user': user, 'comments': comments})

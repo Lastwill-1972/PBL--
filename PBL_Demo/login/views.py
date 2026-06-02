@@ -19,15 +19,15 @@ def login(request):
             errors['password'] = '请输入密码'
         
         if not errors:
-                hashed_password = hashlib.sha256(password.encode()).hexdigest()
-                
-                try:
-                    user = User.objects.get(username=username, password=hashed_password)
-                    request.session['user_id'] = user.id
-                    request.session['username'] = user.username
-                    return redirect('/events/public/')
-                except User.DoesNotExist:
-                    error_message = '用户名或密码错误'
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            
+            try:
+                user = User.objects.get(username=username, password=hashed_password)
+                request.session['user_id'] = user.id
+                request.session['username'] = user.username
+                return redirect('/dashboard/')
+            except User.DoesNotExist:
+                error_message = '用户名或密码错误'
     
     return render(request, 'login.html', {'errors': errors, 'error_message': error_message})
 

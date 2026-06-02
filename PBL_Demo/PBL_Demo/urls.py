@@ -10,22 +10,19 @@ Function views
 Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLConf
+Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import path
+from django.urls import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
     path('login/', include('login.urls')),
     path('events/', include('events.urls')),
-<<<<<<< HEAD
-    path('', include('login.urls')),
-=======
-    path('comments/', include('comment.urls')),
->>>>>>> 7c97f9c (feat:评论功能)
+    path('comment/', include('comment.urls')),
+    path('like/', include('like.urls')),
     path('', include('login.urls')),  # 根路径指向登录页面
 ]

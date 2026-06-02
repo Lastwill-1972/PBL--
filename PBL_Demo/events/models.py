@@ -17,10 +17,8 @@ class Event(models.Model):
     end_time = models.DateTimeField(verbose_name='结束时间')
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='组织者', related_name='organized_events')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name='状态')
-<<<<<<< HEAD
-=======
     is_public = models.BooleanField(default=False, verbose_name='是否公开')
->>>>>>> 7c97f9c (feat:评论功能)
+    like_count = models.IntegerField(default=0, verbose_name='点赞数')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

@@ -98,10 +98,6 @@
         <h1>{{ event|yesno:"编辑活动,创建活动" }}</h1>
         <div>
             <span>欢迎，{{ user.username }}</span>
-<<<<<<< HEAD
-=======
-            <a href="{% url 'events:public_events' %}">公开活动</a>
->>>>>>> 7c97f9c (feat:评论功能)
             <a href="{% url 'events:event_list' %}">我的活动</a>
             <a href="/dashboard/">个人中心</a>
             <a href="/login/logout/">退出</a>
@@ -149,15 +145,16 @@
                 <div class="form-group">
                     <label for="status">状态</label>
                     <select id="status" name="status">
-<<<<<<< HEAD
                         <option value="draft" {% if event.status == 'draft' %}selected{% endif %}>草稿</option>
                         <option value="published" {% if event.status == 'published' %}selected{% endif %}>已发布</option>
-=======
-                        <option value="draft" {% if event.status == 'draft' %}selected{% endif %}>草稿（不公开）</option>
-                        <option value="published" {% if event.status == 'published' %}selected{% endif %}>已发布（公开）</option>
->>>>>>> 7c97f9c (feat:评论功能)
                         <option value="cancelled" {% if event.status == 'cancelled' %}selected{% endif %}>已取消</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="is_public">
+                        <input type="checkbox" id="is_public" name="is_public" {% if event.is_public %}checked{% endif %}>
+                        公开活动（勾选后活动将在公开页面显示）
+                    </label>
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-submit">保存</button>
