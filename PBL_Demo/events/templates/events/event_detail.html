@@ -93,6 +93,70 @@
             background-color: #9E9E9E;
             color: white;
         }
+        .comment-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .comment-form {
+            margin-bottom: 30px;
+        }
+        .comment-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        .comment-form button {
+            margin-top: 10px;
+            padding: 10px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .comment-list {
+            list-style: none;
+            padding: 0;
+        }
+        .comment-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .comment-author {
+            font-weight: bold;
+            color: #333;
+        }
+        .comment-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .comment-content {
+            color: #555;
+            line-height: 1.6;
+        }
+        .comment-delete {
+            color: #f44336;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        .no-comments {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -136,6 +200,35 @@
                 <a href="{% url 'events:event_delete' event.id %}" class="btn btn-delete">删除活动</a>
                 <a href="{% url 'events:event_list' %}" class="btn btn-list">返回列表</a>
             </div>
+        </div>
+
+        <div class="comment-section">
+            <h3>评论 ({{ comments.count }})</h3>
+            <div class="comment-form">
+                <form method="post" action="{% url 'comment:add_comment' event.id %}">
+                    {% csrf_token %}
+                    <textarea name="content" rows="3" placeholder="发表评论..."></textarea>
+                    <button type="submit">发表评论</button>
+                </form>
+            </div>
+            {% if comments %}
+            <ul class="comment-list">
+                {% for comment in comments %}
+                <li class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">{{ comment.user.username }}</span>
+                        <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                    </div>
+                    <div class="comment-content">{{ comment.content }}</div>
+                    {% if comment.user.id == user.id %}
+                    <a href="{% url 'comment:delete_comment' comment.id %}" class="comment-delete" onclick="return confirm('确定要删除这条评论吗？')">删除</a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-comments">暂无评论，快来发表第一条评论吧！</p>
+            {% endif %}
         </div>
     </div>
 </body>

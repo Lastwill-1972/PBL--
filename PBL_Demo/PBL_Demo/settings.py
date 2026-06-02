@@ -39,8 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'register',
     'login',
-    'events'
-    'login'
+    'events',
+    'comment',
+    'like',
 ]
 
 MIDDLEWARE = [

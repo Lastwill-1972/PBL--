@@ -22,6 +22,7 @@ urlpatterns = [
     path('register/', include('register.urls')),
     path('login/', include('login.urls')),
     path('events/', include('events.urls')),
-    path('', include('login.urls')),
+    path('comment/', include('comment.urls')),
+    path('like/', include('like.urls')),
     path('', include('login.urls')),  # 根路径指向登录页面
 ]
