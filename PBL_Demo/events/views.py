@@ -1,11 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from register.models import User
 from .models import Event
 from comment.models import Comment
 
 
+def login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('user_id'):
+            return redirect('/login/')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+@login_required
 def public_event_list(request):
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
     events = Event.objects.filter(is_public=True, status='published').order_by('-start_time')
     events_with_comments = []
     for event in events:
@@ -15,15 +26,25 @@ def public_event_list(request):
             'comments': comments,
             'comment_count': event.comments.count()
         })
-    return render(request, 'events/public_event_list.html', {'events_with_comments': events_with_comments})
+    return render(request, 'events/public_event_list.html', {'events_with_comments': events_with_comments, 'user': user})
 
 
-def login_required(view_func):
-    def wrapper(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return redirect('/login/')
-        return view_func(request, *args, **kwargs)
-    return wrapper
+@login_required
+def favorite_events(request):
+    """用户收藏的活动列表 - 作为主页"""
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+    
+    # 获取用户收藏的活动
+    from favorite.models import Favorite
+    favorite_event_ids = Favorite.objects.filter(user_id=user_id).values('event_id')
+    favorite_events = Event.objects.filter(
+        id__in=favorite_event_ids,
+        is_public=True,
+        status='published'
+    ).order_by('-start_time')
+    
+    return render(request, 'events/favorite_events.html', {'favorite_events': favorite_events, 'user': user})
 
 
 @login_required
@@ -129,14 +150,28 @@ def event_delete(request, event_id):
         return HttpResponseForbidden('您没有权限删除此活动')
 
     if request.method == 'POST':
-        from django.db import connection, ProgrammingError
+        from django.db import connection, IntegrityError, ProgrammingError
+        
         try:
+            # 先删除关联的评论
+            Comment.objects.filter(event=event).delete()
+            
+            # 再删除关联的收藏
+            from favorite.models import Favorite
+            Favorite.objects.filter(event=event).delete()
+            
+            # 最后删除活动
             event.delete()
-        except ProgrammingError as e:
-            # 如果是因为关联表不存在导致的错误，直接用SQL删除
-            if 'Table' in str(e) and 'doesn\'t exist' in str(e):
-                with connection.cursor() as cursor:
-                    cursor.execute("DELETE FROM events_event WHERE id = %s", [event_id])
+        except (IntegrityError, ProgrammingError) as e:
+            # 如果遇到外键约束错误，使用SQL直接删除
+            with connection.cursor() as cursor:
+                # 先删除评论
+                cursor.execute("DELETE FROM comment_comment WHERE event_id = %s", [event_id])
+                # 删除收藏
+                cursor.execute("DELETE FROM favorite_favorite WHERE event_id = %s", [event_id])
+                # 删除活动
+                cursor.execute("DELETE FROM events_event WHERE id = %s", [event_id])
+        
         return redirect('events:event_list')
 
     return render(request, 'events/event_confirm_delete.html', {'event': event, 'user': user})

@@ -25,7 +25,7 @@ def login(request):
                 user = User.objects.get(username=username, password=hashed_password)
                 request.session['user_id'] = user.id
                 request.session['username'] = user.username
-                return redirect('/dashboard/')
+                return redirect('/events/favorites/')
             except User.DoesNotExist:
                 error_message = '用户名或密码错误'
     
