@@ -86,8 +86,9 @@
         <h1>活动管理系统</h1>
         <div>
             <span>欢迎，{{ user.username }}</span>
+            <a href="/events/favorites/">我的收藏</a>
             <a href="/events/public/">公开活动</a>
-            <a href="/dashboard/">个人中心</a>
+            <a href="/events/">我的活动</a>
             <a href="/login/logout/">退出</a>
         </div>
     </div>
@@ -103,6 +104,8 @@
                         <th>开始时间</th>
                         <th>结束时间</th>
                         <th>状态</th>
+                        <th>收藏数</th>
+                        <th>点赞数</th>
                         <th>操作</th>
                     </tr>
                 </thead>
@@ -122,6 +125,8 @@
                                 <span class="status-cancelled">已取消</span>
                             {% endif %}
                         </td>
+                        <td>⭐ {{ event.favorite_count }}</td>
+                        <td>❤️ {{ event.like_count }}</td>
                         <td>
                             <a href="{% url 'events:event_detail' event.id %}" class="action-btn btn-view">查看</a>
                             <a href="{% url 'events:event_edit' event.id %}" class="action-btn btn-edit">编辑</a>

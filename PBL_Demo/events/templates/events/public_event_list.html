@@ -237,6 +237,27 @@
             gap: 15px;
             margin-top: 15px;
         }
+        .favorite-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            color: #666;
+        }
+        .favorite-button:hover {
+            background-color: #f0f0f0;
+        }
+        .favorite-button.favorited {
+            color: #ff9800;
+        }
+        .favorite-count {
+            font-size: 14px;
+        }
     </style>
     <script>
         // 获取 CSRF token
@@ -363,16 +384,47 @@
                 console.error('评论失败:', error);
             });
         }
+
+        // 收藏活动
+        function favoriteEvent(eventId) {
+            const button = document.querySelector(`.favorite-event-btn-${eventId}`);
+            const countSpan = document.querySelector(`.favorite-event-count-${eventId}`);
+            
+            fetch(`/favorite/event/${eventId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    countSpan.textContent = data.favorite_count;
+                    if (data.favorited) {
+                        button.classList.add('favorited');
+                    } else {
+                        button.classList.remove('favorited');
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('收藏失败:', error);
+            });
+        }
     </script>
 </head>
 <body>
     <div class="header">
         <h1>活动管理系统</h1>
         <div class="header-right">
-            <a href="/">首页</a>
+            <span>欢迎，{{ user.username }}</span>
+            <a href="/events/favorites/">我的收藏</a>
             <a href="/events/public/">公开活动</a>
-            <a href="/login/">登录</a>
-            <a href="/register/">注册</a>
+            <a href="/events/">我的活动</a>
+            <a href="/login/logout/">退出</a>
         </div>
     </div>
     <div class="container">
@@ -409,6 +461,10 @@
                         <button onclick="likeEvent({{ event.id }})" class="like-event-btn-{{ event.id }} like-button">
                             <span>❤️</span>
                             <span class="like-event-count-{{ event.id }}">{{ event.like_count }}</span>
+                        </button>
+                        <button onclick="favoriteEvent({{ event.id }})" class="favorite-event-btn-{{ event.id }} favorite-button">
+                            <span>⭐</span>
+                            <span class="favorite-event-count-{{ event.id }}">{{ event.favorite_count }}</span>
                         </button>
                     </div>
                     
