@@ -87,6 +87,7 @@
         <div>
             <span>欢迎，{{ user.username }}</span>
             <a href="/events/favorites/">我的收藏</a>
+            <a href="/enroll/my/">我的报名</a>
             <a href="/events/public/">公开活动</a>
             <a href="/events/">我的活动</a>
             <a href="/login/logout/">退出</a>
@@ -106,6 +107,7 @@
                         <th>状态</th>
                         <th>收藏数</th>
                         <th>点赞数</th>
+                        <th>报名数</th>
                         <th>操作</th>
                     </tr>
                 </thead>
@@ -127,6 +129,7 @@
                         </td>
                         <td>⭐ {{ event.favorite_count }}</td>
                         <td>❤️ {{ event.like_count }}</td>
+                        <td>📝 {{ event.enroll_count }}</td>
                         <td>
                             <a href="{% url 'events:event_detail' event.id %}" class="action-btn btn-view">查看</a>
                             <a href="{% url 'events:event_edit' event.id %}" class="action-btn btn-edit">编辑</a>

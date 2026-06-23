@@ -46,20 +46,26 @@ def add_comment(request, event_id):
 
 @login_required
 def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id)
+    try:
+        comment = Comment.objects.get(id=comment_id)
+    except Comment.DoesNotExist:
+        return JsonResponse({'success': False, 'message': '评论不存在'}, status=404)
+    
     user_id = request.session.get('user_id')
 
     if comment.user.id != user_id:
-        return HttpResponseForbidden('您没有权限删除此评论')
+        return JsonResponse({'success': False, 'message': '您没有权限删除此评论'}, status=403)
 
-    event_id = comment.event.id
-    
     try:
-        comment.delete()
-    except ProgrammingError as e:
-        # 如果是因为关联表不存在导致的错误，直接用SQL删除
-        if 'Table' in str(e) and 'doesn\'t exist' in str(e):
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM like_like WHERE comment_id = %s", [comment_id])
+            cursor.execute("DELETE FROM comment_comment WHERE id = %s", [comment_id])
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        try:
             with connection.cursor() as cursor:
                 cursor.execute("DELETE FROM comment_comment WHERE id = %s", [comment_id])
-    
-    return redirect('events:event_detail', event_id=event_id)
+            return JsonResponse({'success': True})
+        except Exception as e2:
+            return JsonResponse({'success': False, 'message': str(e2)}, status=500)
