@@ -371,16 +371,33 @@
                 if (data.success) {
                     // 清空输入框
                     textarea.value = '';
-                    
+
                     // 更新评论计数
                     const commentCountSpan = document.querySelector(`.comment-count-${eventId}`);
                     if (commentCountSpan) {
                         const currentCount = parseInt(commentCountSpan.textContent);
                         commentCountSpan.textContent = currentCount + 1;
                     }
-                    
+
                     // 添加新评论到列表
-                    const commentList = document.querySelector(`.comment-list-${eventId}`);
+                    let commentList = document.querySelector(`.comment-list-${eventId}`);
+                    const commentSection = document.querySelector(`.comment-section-${eventId}`);
+
+                    if (!commentList && commentSection) {
+                        // 首次评论：创建评论列表
+                        commentList = document.createElement('ul');
+                        commentList.className = `comment-list comment-list-${eventId}`;
+
+                        // 删除"暂无评论"提示
+                        const emptyMessage = commentSection.querySelector('p');
+                        if (emptyMessage) {
+                            emptyMessage.remove();
+                        }
+
+                        // 将评论列表插入到评论区域
+                        commentSection.appendChild(commentList);
+                    }
+
                     if (commentList) {
                         const newComment = document.createElement('li');
                         newComment.className = 'comment-item';

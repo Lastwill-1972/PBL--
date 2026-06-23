@@ -132,16 +132,33 @@ def event_edit(request, event_id):
         new_is_public = request.POST.get('is_public') == 'on'
         event.is_public = new_is_public
         event.status = request.POST.get('status', 'draft')
+
+        # 如果勾选公开活动且状态是草稿，自动改为已发布
         if new_is_public and event.status == 'draft':
             event.status = 'published'
+        # 如果取消公开活动且状态是已发布，自动改为草稿
+        elif not new_is_public and event.status == 'published':
+            event.status = 'draft'
+
         event.save()
 
         if old_is_public and not new_is_public:
-            Comment.objects.filter(event=event).delete()
-            from favorite.models import Favorite
-            Favorite.objects.filter(event=event).delete()
-            from enroll.models import Enroll
-            Enroll.objects.filter(event=event).delete()
+            try:
+                Comment.objects.filter(event=event).delete()
+            except ProgrammingError:
+                pass
+            
+            try:
+                from favorite.models import Favorite
+                Favorite.objects.filter(event=event).delete()
+            except (ImportError, ProgrammingError):
+                pass
+            
+            try:
+                from enroll.models import Enroll
+                Enroll.objects.filter(event=event).delete()
+            except (ImportError, ProgrammingError):
+                pass
 
         return redirect('events:event_list')
 
