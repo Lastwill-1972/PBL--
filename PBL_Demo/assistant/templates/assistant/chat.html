@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBL 智能助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(76, 175, 80, 0.3);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-left .logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .header-right a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 18px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .header-right a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1200px;
+            margin: 30px auto;
+            width: 100%;
+            padding: 0 20px;
+            gap: 25px;
+        }
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 20px;
+            flex-shrink: 0;
+        }
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .quick-links {
+            list-style: none;
+        }
+        .quick-links li {
+            margin-bottom: 10px;
+        }
+        .quick-links a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .quick-links a:hover {
+            background: #e8f5e9;
+            color: #4CAF50;
+            transform: translateX(5px);
+        }
+        .quick-links .icon {
+            width: 30px;
+            height: 30px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .features {
+            margin-top: 25px;
+        }
+        .features-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 13px;
+            color: #666;
+        }
+        .feature-item .dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 18px 25px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-header .avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        .chat-header .info {
+            flex: 1;
+        }
+        .chat-header .info h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        .chat-header .info p {
+            font-size: 12px;
+            color: #888;
+        }
+        .chat-header .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-header .actions button {
+            padding: 6px 14px;
+            background: #fff5f5;
+            border: 1px solid #ffebee;
+            border-radius: 20px;
+            color: #e53935;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .chat-header .actions button:hover {
+            background: #ffebee;
+        }
+        .chat-header .status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #4CAF50;
+        }
+        .chat-header .status .online {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .messages-container {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .welcome-card .greeting-icon {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 30px;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+        .welcome-card h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .welcome-card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .suggestion-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .suggestion-card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+            transform: translateY(-2px);
+        }
+        .suggestion-card .icon {
+            width: 36px;
+            height: 36px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .suggestion-card .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .suggestion-card .desc {
+            font-size: 12px;
+            color: #888;
+        }
+        .message-wrapper {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-wrapper.user {
+            flex-direction: row-reverse;
+        }
+        .message-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+        .message-wrapper.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .message-wrapper.assistant .message-avatar {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+        .message-content {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            font-size: 14px;
+            position: relative;
+        }
+        .message-wrapper.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        .message-wrapper.assistant .message-content {
+            background: #f5f5f5;
+            color: #333;
+            border-bottom-left-radius: 6px;
+        }
+        .message-wrapper.error .message-content {
+            background: #fff0f0;
+            color: #d32f2f;
+            border-bottom-left-radius: 6px;
+        }
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            padding-left: 50px;
+        }
+        .message-wrapper.user .message-time {
+            text-align: right;
+            padding-left: 0;
+            padding-right: 50px;
+        }
+        .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            background: #e53935;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .message-wrapper:hover .delete-btn {
+            opacity: 1;
+        }
+        .message-wrapper.user .delete-btn {
+            right: auto;
+            left: -8px;
+        }
+        .typing-indicator {
+            display: flex;
+            gap: 8px;
+        }
+        .typing-indicator .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 14px 18px;
+            background: #f5f5f5;
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+        }
+        .typing-indicator .typing-dots span {
+            width: 7px;
+            height: 7px;
+            background: #999;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        .typing-indicator .typing-dots span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .input-container {
+            padding: 20px 25px;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .input-wrapper {
+            flex: 1;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.3s;
+        }
+        .input-wrapper:focus-within {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        .input-wrapper textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-family: inherit;
+            line-height: 1.5;
+            min-height: 40px;
+            max-height: 120px;
+        }
+        .input-wrapper textarea::placeholder {
+            color: #aaa;
+        }
+        .send-btn {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .clear-btn {
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .clear-btn:hover {
+            color: #4CAF50;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            min-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .modal h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .modal p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        .modal-actions .cancel-btn {
+            background: #f5f5f5;
+            color: #666;
+        }
+        .modal-actions .cancel-btn:hover {
+            background: #eee;
+        }
+        .modal-actions .confirm-btn {
+            background: #e53935;
+            color: white;
+        }
+        .modal-actions .confirm-btn:hover {
+            background: #d32f2f;
+        }
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">🤖</div>
+            <h1>PBL 智能助手</h1>
+        </div>
+        <div class="header-right">
+            <a href="/events/public/">返回活动列表</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-title">快捷导航</div>
+            <ul class="quick-links">
+                <li><a href="/events/create/">
+                    <span class="icon">➕</span>
+                    <span>创建活动</span>
+                </a></li>
+                <li><a href="/events/public/">
+                    <span class="icon">📋</span>
+                    <span>浏览活动</span>
+                </a></li>
+                <li><a href="/enroll/my/">
+                    <span class="icon">🎯</span>
+                    <span>我的报名</span>
+                </a></li>
+                <li><a href="/events/favorites/">
+                    <span class="icon">❤️</span>
+                    <span>我的收藏</span>
+                </a></li>
+            </ul>
+
+            <div class="features">
+                <div class="features-title">AI 助手能力</div>
+                <div class="feature-item">
+                    <span class="dot"></span>
+                    <span>PBL 学习方法指导</span>
+                </div>
+                <div class="feature-item">
+                    <span class="dot"></span>
+                    <span>活动创建建议</span>
+                </div>
+                <div class="feature-item">
+                    <span class="dot"></span>
+                    <span>学习资源推荐</span>
+                </div>
+                <div class="feature-item">
+                    <span class="dot"></span>
+                    <span>平台功能解答</span>
+                </div>
+            </div>
+        </aside>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="avatar">🤖</div>
+                <div class="info">
+                    <h3>PBL 学习助手</h3>
+                    <p>专注于项目式学习的智能助手</p>
+                </div>
+                <div class="actions">
+                    <button onclick="showClearConfirm()">清空对话</button>
+                </div>
+                <div class="status">
+                    <span class="online"></span>
+                    <span>在线</span>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages">
+                <div class="welcome-card">
+                    <div class="greeting-icon">👋</div>
+                    <h3>你好！我是 PBL 学习助手</h3>
+                    <p>我可以帮助你了解项目式学习（PBL）的方法和技巧，<br>也可以解答关于平台使用的任何问题。</p>
+                    <div class="suggestions-grid">
+                        <div class="suggestion-card" onclick="sendSuggestion(this)">
+                            <div class="icon">📚</div>
+                            <div class="title">什么是 PBL？</div>
+                            <div class="desc">了解项目式学习的核心概念</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendSuggestion(this)">
+                            <div class="icon">✨</div>
+                            <div class="title">如何创建活动？</div>
+                            <div class="desc">获取创建活动的详细指南</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendSuggestion(this)">
+                            <div class="icon">🎯</div>
+                            <div class="title">如何报名活动？</div>
+                            <div class="desc">报名流程和注意事项</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendSuggestion(this)">
+                            <div class="icon">💡</div>
+                            <div class="title">给我学习建议</div>
+                            <div class="desc">获取个性化学习建议</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea id="messageInput" placeholder="输入你的问题，我来帮你解答..." 
+                        onkeydown="handleKeyDown(event)" oninput="adjustHeight(this)"></textarea>
+                    <button class="clear-btn" onclick="clearInput()" title="清空">✕</button>
+                </div>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送">
+                    →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="clearModal">
+        <div class="modal">
+            <h4>确认清空对话</h4>
+            <p>确定要清空所有对话记录吗？此操作无法撤销。</p>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="hideClearConfirm()">取消</button>
+                <button class="confirm-btn" onclick="clearAllMessages()">确认清空</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+
+        window.onload = function() {
+            loadHistory();
+        };
+
+        function loadHistory() {
+            fetch('/assistant/history/', {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.history) {
+                    conversationHistory = data.history.map(h => ({role: h.role, content: h.content}));
+                    data.history.forEach(msg => {
+                        addMessage(msg.content, msg.role, msg.id, msg.created_at);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('加载历史失败:', err);
+            });
+        }
+
+        function adjustHeight(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function clearInput() {
+            const input = document.getElementById('messageInput');
+            input.value = '';
+            input.style.height = 'auto';
+            input.focus();
+        }
+
+        function sendSuggestion(card) {
+            const question = card.querySelector('.title').textContent;
+            const input = document.getElementById('messageInput');
+            input.value = question;
+            adjustHeight(input);
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user', null, new Date().toLocaleString());
+            conversationHistory.push({role: 'user', content: message});
+            
+            input.value = '';
+            input.style.height = 'auto';
+
+            showTyping();
+
+            fetch('/assistant/send/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: message
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                hideTyping();
+                if (data.reply) {
+                    addMessage(data.reply, 'assistant', null, new Date().toLocaleString());
+                    conversationHistory.push({role: 'assistant', content: data.reply});
+                } else if (data.error) {
+                    addMessage(data.error, 'error');
+                }
+            })
+            .catch(err => {
+                hideTyping();
+                addMessage('网络错误，请稍后重试', 'error');
+            });
+        }
+
+        function addMessage(text, type, messageId, time) {
+            const container = document.getElementById('messages');
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${type}`;
+            if (messageId) {
+                wrapper.dataset.id = messageId;
+            }
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = type === 'user' ? '👤' : '🤖';
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+
+            if (type !== 'error') {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '✕';
+                deleteBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    deleteMessage(wrapper, messageId);
+                };
+                wrapper.appendChild(deleteBtn);
+            }
+
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(content);
+            container.appendChild(wrapper);
+
+            if (time) {
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = time;
+                container.appendChild(timeDiv);
+            }
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function deleteMessage(wrapper, messageId) {
+            if (!messageId) {
+                wrapper.remove();
+                return;
+            }
+            
+            fetch(`/assistant/delete/${messageId}/`, {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    wrapper.remove();
+                }
+            })
+            .catch(err => {
+                console.error('删除失败:', err);
+            });
+        }
+
+        function showClearConfirm() {
+            document.getElementById('clearModal').classList.add('show');
+        }
+
+        function hideClearConfirm() {
+            document.getElementById('clearModal').classList.remove('show');
+        }
+
+        function clearAllMessages() {
+            fetch('/assistant/clear/', {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const container = document.getElementById('messages');
+                    container.innerHTML = `
+                        <div class="welcome-card">
+                            <div class="greeting-icon">👋</div>
+                            <h3>对话已清空</h3>
+                            <p>我可以帮助你了解项目式学习（PBL）的方法和技巧，<br>也可以解答关于平台使用的任何问题。</p>
+                            <div class="suggestions-grid">
+                                <div class="suggestion-card" onclick="sendSuggestion(this)">
+                                    <div class="icon">📚</div>
+                                    <div class="title">什么是 PBL？</div>
+                                    <div class="desc">了解项目式学习的核心概念</div>
+                                </div>
+                                <div class="suggestion-card" onclick="sendSuggestion(this)">
+                                    <div class="icon">✨</div>
+                                    <div class="title">如何创建活动？</div>
+                                    <div class="desc">获取创建活动的详细指南</div>
+                                </div>
+                                <div class="suggestion-card" onclick="sendSuggestion(this)">
+                                    <div class="icon">🎯</div>
+                                    <div class="title">如何报名活动？</div>
+                                    <div class="desc">报名流程和注意事项</div>
+                                </div>
+                                <div class="suggestion-card" onclick="sendSuggestion(this)">
+                                    <div class="icon">💡</div>
+                                    <div class="title">给我学习建议</div>
+                                    <div class="desc">获取个性化学习建议</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    conversationHistory = [];
+                }
+            })
+            .catch(err => {
+                console.error('清空失败:', err);
+            });
+            hideClearConfirm();
+        }
+
+        function showTyping() {
+            const container = document.getElementById('messages');
+            const typing = document.createElement('div');
+            typing.className = 'typing-indicator';
+            typing.id = 'typing';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+
+            const dots = document.createElement('div');
+            dots.className = 'typing-dots';
+            dots.innerHTML = '<span></span><span></span><span></span>';
+
+            typing.appendChild(avatar);
+            typing.appendChild(dots);
+            container.appendChild(typing);
+            container.scrollTop = container.scrollHeight;
+            
+            document.getElementById('sendBtn').disabled = true;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+            document.getElementById('sendBtn').disabled = false;
+        }
+    </script>
+</body>
+</html>

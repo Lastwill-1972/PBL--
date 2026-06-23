@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'like',
     'favorite',
     'enroll',
+    'assistant',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,8 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# DeepSeek API 配置
+# 请在这里填入你的 DeepSeek API Key，项目上传时未加入密钥，否则无法上传
+DEEPSEEK_API_KEY = ''
+DEEPSEEK_MODEL = 'deepseek-chat'

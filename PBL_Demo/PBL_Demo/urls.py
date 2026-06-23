@@ -26,5 +26,6 @@ urlpatterns = [
     path('like/', include('like.urls')),
     path('favorite/', include('favorite.urls')),
     path('enroll/', include('enroll.urls')),
+    path('assistant/', include('assistant.urls')),
     path('', include('login.urls')),  # 根路径指向登录页面
 ]
