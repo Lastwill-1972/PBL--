@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'comment',
     'like',
     'favorite',
+    'enroll',
 ]
 
 MIDDLEWARE = [

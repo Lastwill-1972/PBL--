@@ -20,6 +20,7 @@ class Event(models.Model):
     is_public = models.BooleanField(default=False, verbose_name='是否公开')
     like_count = models.IntegerField(default=0, verbose_name='点赞数')
     favorite_count = models.IntegerField(default=0, verbose_name='收藏数')
+    enroll_count = models.IntegerField(default=0, verbose_name='报名数')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

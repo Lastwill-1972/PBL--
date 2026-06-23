@@ -66,8 +66,10 @@ def event_create(request):
         location = request.POST.get('location')
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
-        status = request.POST.get('status', 'draft')
         is_public = request.POST.get('is_public') == 'on'
+        status = request.POST.get('status', 'draft')
+        if is_public and status == 'draft':
+            status = 'published'
 
         errors = {}
         if not title:
@@ -127,13 +129,19 @@ def event_edit(request, event_id):
         event.location = request.POST.get('location')
         event.start_time = request.POST.get('start_time')
         event.end_time = request.POST.get('end_time')
-        event.status = request.POST.get('status', 'draft')
         new_is_public = request.POST.get('is_public') == 'on'
         event.is_public = new_is_public
+        event.status = request.POST.get('status', 'draft')
+        if new_is_public and event.status == 'draft':
+            event.status = 'published'
         event.save()
 
         if old_is_public and not new_is_public:
             Comment.objects.filter(event=event).delete()
+            from favorite.models import Favorite
+            Favorite.objects.filter(event=event).delete()
+            from enroll.models import Enroll
+            Enroll.objects.filter(event=event).delete()
 
         return redirect('events:event_list')
 
@@ -150,7 +158,7 @@ def event_delete(request, event_id):
         return HttpResponseForbidden('您没有权限删除此活动')
 
     if request.method == 'POST':
-        from django.db import connection, IntegrityError, ProgrammingError
+        from django.db import connection, ProgrammingError, IntegrityError, ProgrammingError
         
         try:
             # 先删除关联的评论
@@ -159,6 +167,10 @@ def event_delete(request, event_id):
             # 再删除关联的收藏
             from favorite.models import Favorite
             Favorite.objects.filter(event=event).delete()
+            
+            # 删除关联的报名
+            from enroll.models import Enroll
+            Enroll.objects.filter(event=event).delete()
             
             # 最后删除活动
             event.delete()
@@ -169,6 +181,8 @@ def event_delete(request, event_id):
                 cursor.execute("DELETE FROM comment_comment WHERE event_id = %s", [event_id])
                 # 删除收藏
                 cursor.execute("DELETE FROM favorite_favorite WHERE event_id = %s", [event_id])
+                # 删除报名
+                cursor.execute("DELETE FROM enroll_enroll WHERE event_id = %s", [event_id])
                 # 删除活动
                 cursor.execute("DELETE FROM events_event WHERE id = %s", [event_id])
         

@@ -11,6 +11,24 @@
             padding: 0;
             background-color: #f5f5f5;
         }
+        .like-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            color: #666;
+        }
+        .like-button:hover {
+            background-color: #f0f0f0;
+        }
+        .like-button.liked {
+            color: #f44336;
+        }
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -158,6 +176,165 @@
             padding: 20px;
         }
     </style>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        function addComment(eventId) {
+            const textarea = document.querySelector('#comment-content');
+            const content = textarea.value.trim();
+            
+            if (!content) return;
+            
+            fetch(`/comment/add/${eventId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    textarea.value = '';
+                    
+                    const commentList = document.querySelector('.comment-list');
+                    if (commentList) {
+                        const newComment = document.createElement('li');
+                        newComment.className = 'comment-item';
+                        newComment.setAttribute('data-comment-id', data.comment_id);
+                        newComment.innerHTML = `
+                            <div class="comment-header">
+                                <span class="comment-author">${data.user_name}</span>
+                                <span class="comment-time">刚刚</span>
+                            </div>
+                            <div class="comment-content">${data.content}</div>
+                            <div style="margin-top: 10px; display: flex; gap: 15px; align-items: center;">
+                                <button onclick="likeComment(${data.comment_id})" class="like-button" style="padding: 4px 8px;">
+                                    <span>❤️</span>
+                                    <span class="like-comment-count-${data.comment_id}">0</span>
+                                </button>
+                            </div>
+                        `;
+                        commentList.insertBefore(newComment, commentList.firstChild);
+                    } else {
+                        const noComments = document.querySelector('.no-comments');
+                        if (noComments) {
+                            noComments.remove();
+                        }
+                        const commentSection = document.querySelector('.comment-section');
+                        const newUl = document.createElement('ul');
+                        newUl.className = 'comment-list';
+                        newUl.innerHTML = `
+                            <li class="comment-item" data-comment-id="${data.comment_id}">
+                                <div class="comment-header">
+                                    <span class="comment-author">${data.user_name}</span>
+                                    <span class="comment-time">刚刚</span>
+                                </div>
+                                <div class="comment-content">${data.content}</div>
+                                <div style="margin-top: 10px; display: flex; gap: 15px; align-items: center;">
+                                    <button onclick="likeComment(${data.comment_id})" class="like-button" style="padding: 4px 8px;">
+                                        <span>❤️</span>
+                                        <span class="like-comment-count-${data.comment_id}">0</span>
+                                    </button>
+                                </div>
+                            </li>
+                        `;
+                        commentSection.appendChild(newUl);
+                    }
+                    
+                    const commentCountSpan = document.querySelector('.comment-section h3');
+                    if (commentCountSpan) {
+                        const currentCount = parseInt(commentCountSpan.textContent.match(/\d+/)[0]);
+                        commentCountSpan.textContent = `评论 (${currentCount + 1})`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('评论失败:', error);
+            });
+        }
+
+        function likeComment(commentId) {
+            const button = document.querySelector(`button[onclick="likeComment(${commentId})"]`);
+            const countSpan = document.querySelector(`.like-comment-count-${commentId}`);
+            
+            fetch(`/like/comment/${commentId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                countSpan.textContent = data.like_count;
+                if (data.liked) {
+                    button.classList.add('liked');
+                } else {
+                    button.classList.remove('liked');
+                }
+            })
+            .catch(error => {
+                console.error('点赞失败:', error);
+            });
+        }
+
+        function deleteComment(commentId) {
+            if (!confirm('确定要删除这条评论吗？')) return;
+            
+            const commentItem = document.querySelector(`.comment-item[data-comment-id="${commentId}"]`);
+            
+            fetch(`/comment/delete/${commentId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('HTTP error:', response.status);
+                    return response.json().catch(() => ({ success: false, message: '请求失败' }));
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('删除响应:', data);
+                if (data.success) {
+                    if (commentItem) {
+                        commentItem.remove();
+                    }
+                    
+                    const commentCountSpan = document.querySelector('.comment-section h3');
+                    if (commentCountSpan) {
+                        const currentCount = parseInt(commentCountSpan.textContent.match(/\d+/)[0]);
+                        commentCountSpan.textContent = `评论 (${currentCount - 1})`;
+                    }
+                } else {
+                    alert(data.message || '删除失败');
+                }
+            })
+            .catch(error => {
+                console.error('删除失败:', error);
+                alert('删除失败，请重试');
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="header">
@@ -205,24 +382,27 @@
         <div class="comment-section">
             <h3>评论 ({{ comments.count }})</h3>
             <div class="comment-form">
-                <form method="post" action="{% url 'comment:add_comment' event.id %}">
-                    {% csrf_token %}
-                    <textarea name="content" rows="3" placeholder="发表评论..."></textarea>
-                    <button type="submit">发表评论</button>
-                </form>
+                <textarea id="comment-content" rows="3" placeholder="发表评论..."></textarea>
+                <button onclick="addComment({{ event.id }})">发表评论</button>
             </div>
             {% if comments %}
             <ul class="comment-list">
                 {% for comment in comments %}
-                <li class="comment-item">
+                <li class="comment-item" data-comment-id="{{ comment.id }}">
                     <div class="comment-header">
                         <span class="comment-author">{{ comment.user.username }}</span>
                         <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
                     </div>
                     <div class="comment-content">{{ comment.content }}</div>
-                    {% if comment.user.id == user.id %}
-                    <a href="{% url 'comment:delete_comment' comment.id %}" class="comment-delete" onclick="return confirm('确定要删除这条评论吗？')">删除</a>
-                    {% endif %}
+                    <div style="margin-top: 10px; display: flex; gap: 15px; align-items: center;">
+                        <button onclick="likeComment({{ comment.id }})" class="like-button" style="padding: 4px 8px;">
+                            <span>❤️</span>
+                            <span class="like-comment-count-{{ comment.id }}">{{ comment.like_count }}</span>
+                        </button>
+                        {% if comment.user.id == user.id %}
+                        <button onclick="deleteComment({{ comment.id }})" class="comment-delete-btn" style="background: #f44336; border: none; color: white; cursor: pointer; font-size: 12px; padding: 4px 10px; border-radius: 3px;">删除</button>
+                        {% endif %}
+                    </div>
                 </li>
                 {% endfor %}
             </ul>

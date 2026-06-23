@@ -258,6 +258,27 @@
         .favorite-count {
             font-size: 14px;
         }
+        .enroll-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            color: #666;
+        }
+        .enroll-button:hover {
+            background-color: #f0f0f0;
+        }
+        .enroll-button.enrolled {
+            color: #2196F3;
+        }
+        .enroll-count {
+            font-size: 14px;
+        }
     </style>
     <script>
         // 获取 CSRF token
@@ -414,6 +435,36 @@
                 console.error('收藏失败:', error);
             });
         }
+
+        // 报名活动
+        function enrollEvent(eventId) {
+            const button = document.querySelector(`.enroll-event-btn-${eventId}`);
+            const countSpan = document.querySelector(`.enroll-event-count-${eventId}`);
+            
+            fetch(`/enroll/event/${eventId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    countSpan.textContent = data.enroll_count;
+                    if (data.enrolled) {
+                        button.classList.add('enrolled');
+                    } else {
+                        button.classList.remove('enrolled');
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('报名失败:', error);
+            });
+        }
     </script>
 </head>
 <body>
@@ -422,6 +473,7 @@
         <div class="header-right">
             <span>欢迎，{{ user.username }}</span>
             <a href="/events/favorites/">我的收藏</a>
+            <a href="/enroll/my/">我的报名</a>
             <a href="/events/public/">公开活动</a>
             <a href="/events/">我的活动</a>
             <a href="/login/logout/">退出</a>
@@ -465,6 +517,10 @@
                         <button onclick="favoriteEvent({{ event.id }})" class="favorite-event-btn-{{ event.id }} favorite-button">
                             <span>⭐</span>
                             <span class="favorite-event-count-{{ event.id }}">{{ event.favorite_count }}</span>
+                        </button>
+                        <button onclick="enrollEvent({{ event.id }})" class="enroll-event-btn-{{ event.id }} enroll-button">
+                            <span>📝</span>
+                            <span class="enroll-event-count-{{ event.id }}">{{ event.enroll_count }}</span>
                         </button>
                     </div>
                     
@@ -515,8 +571,7 @@
             {% else %}
             <div class="empty-message">
                 <p>暂无公开活动</p>
-                <p>登录后创建并发布您的活动</p>
-                <a href="/login/" class="btn">立即登录</a>
+                <a href="/events/" class="btn">创建活动</a>
             </div>
             {% endif %}
         </div>
